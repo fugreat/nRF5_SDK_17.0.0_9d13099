@@ -81,7 +81,11 @@
 #include "nrf_log.h"
 #include "nrf_log_ctrl.h"
 #include "nrf_log_default_backends.h"
+
 #include "bsp_timer.h"
+#include "bsp_led.h"
+#include "bsp_list.h"	
+
 
 #define DEVICE_NAME                     "Nordic_Template"                       /**< Name of device. Will be included in the advertising data. */
 #define MANUFACTURER_NAME               "NordicSemiconductor"                   /**< Manufacturer. Will be passed to Device Information Service. */
@@ -189,7 +193,7 @@ static void timers_init(void)
        ret_code_t err_code;
        err_code = app_timer_create(&m_app_timer_id, APP_TIMER_MODE_REPEATED, timer_timeout_handler);
        APP_ERROR_CHECK(err_code); */
-	CreateTestTimer();
+	//CreateTestTimer();
 }
 
 
@@ -376,7 +380,7 @@ static void application_timers_start(void)
        ret_code_t err_code;
        err_code = app_timer_start(m_app_timer_id, TIMER_INTERVAL, NULL);
        APP_ERROR_CHECK(err_code); */
-		StartTestTimer();
+		//StartTestTimer();
 }
 
 
@@ -708,9 +712,15 @@ int main(void)
     bool erase_bonds;
 
     // Initialize.
+	
+	
+/***********************************************************************************/
     log_init();
     timers_init();
     buttons_leds_init(&erase_bonds);
+		Board_LED0Init();
+/***********************************************************************************/
+	
     power_management_init();
     ble_stack_init();
     gap_params_init();
@@ -719,7 +729,9 @@ int main(void)
     services_init();
     conn_params_init();
     peer_manager_init();
-
+		
+/**********************************************************************************/
+		
     // Start execution.
     NRF_LOG_INFO("Template example started.");
     application_timers_start();

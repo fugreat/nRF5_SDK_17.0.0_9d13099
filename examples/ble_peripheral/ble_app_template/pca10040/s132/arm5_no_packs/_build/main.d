@@ -101,3 +101,5 @@
 .\_build\main.o: ..\..\..\..\..\..\components\libraries\balloc\nrf_balloc.h
 .\_build\main.o: ..\..\..\..\..\..\components\libraries\log\nrf_log_default_backends.h
 .\_build\main.o: ..\..\..\..\..\bsp\template\bsp_timer.h
+.\_build\main.o: ..\..\..\..\..\bsp\template\bsp_led.h
+.\_build\main.o: ..\..\..\..\..\bsp\template\bsp_list.h
