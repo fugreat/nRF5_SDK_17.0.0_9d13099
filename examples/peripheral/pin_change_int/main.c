@@ -78,22 +78,27 @@ void in_pin_handler(nrf_drv_gpiote_pin_t pin, nrf_gpiote_polarity_t action)
 static void gpio_init(void)
 {
     ret_code_t err_code;
-
+//初始化GPIOTE模块
     err_code = nrf_drv_gpiote_init();
     APP_ERROR_CHECK(err_code);
 
+//定义GPIOTE输出初始化结构体并赋值
     nrf_drv_gpiote_out_config_t out_config = GPIOTE_CONFIG_OUT_SIMPLE(false);
 
+//初始化GPIOTE输出引脚
     err_code = nrf_drv_gpiote_out_init(PIN_OUT, &out_config);
     APP_ERROR_CHECK(err_code);
 
+//配置设置GPIOTE输入参数，从低电平到高电平
     nrf_drv_gpiote_in_config_t in_config = GPIOTE_CONFIG_IN_SENSE_TOGGLE(true);
     in_config.pull = NRF_GPIO_PIN_PULLUP;
 
-    err_code = nrf_drv_gpiote_in_init(PIN_IN, &in_config, in_pin_handler);
+// GPIOTE输入初始化，设置触发中断
+    err_code = nrf_drv_gpiote_in_init(16, &in_config, in_pin_handler);
     APP_ERROR_CHECK(err_code);
 
-    nrf_drv_gpiote_in_event_enable(PIN_IN, true);
+// 设置GPIOE输入事件使能
+    nrf_drv_gpiote_in_event_enable(16, true);
 }
 
 /**
