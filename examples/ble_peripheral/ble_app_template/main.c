@@ -84,8 +84,7 @@
 
 #include "bsp_timer.h"
 #include "bsp_led.h"
-#include "bsp_list.h"	
-
+#include "bsp_list.h"
 
 #define DEVICE_NAME                     "Nordic_Template"                       /**< Name of device. Will be included in the advertising data. */
 #define MANUFACTURER_NAME               "NordicSemiconductor"                   /**< Manufacturer. Will be passed to Device Information Service. */
@@ -147,7 +146,7 @@ static void advertising_start(bool erase_bonds);
  * @param[in] line_num   Line number of the failing ASSERT call.
  * @param[in] file_name  File name of the failing ASSERT call.
  */
-void assert_nrf_callback(uint16_t line_num, const uint8_t * p_file_name)
+void assert_nrf_callback(uint16_t line_num, const uint8_t *p_file_name)
 {
     app_error_handler(DEAD_BEEF, line_num, p_file_name);
 }
@@ -157,19 +156,19 @@ void assert_nrf_callback(uint16_t line_num, const uint8_t * p_file_name)
  *
  * @param[in] p_evt  Peer Manager event.
  */
-static void pm_evt_handler(pm_evt_t const * p_evt)
+static void pm_evt_handler(pm_evt_t const *p_evt)
 {
     pm_handler_on_pm_evt(p_evt);
     pm_handler_flash_clean(p_evt);
 
     switch (p_evt->evt_id)
     {
-        case PM_EVT_PEERS_DELETE_SUCCEEDED:
-            advertising_start(false);
-            break;
+    case PM_EVT_PEERS_DELETE_SUCCEEDED:
+        advertising_start(false);
+        break;
 
-        default:
-            break;
+    default:
+        break;
     }
 }
 
@@ -193,7 +192,7 @@ static void timers_init(void)
        ret_code_t err_code;
        err_code = app_timer_create(&m_app_timer_id, APP_TIMER_MODE_REPEATED, timer_timeout_handler);
        APP_ERROR_CHECK(err_code); */
-	//CreateTestTimer();
+    //CreateTestTimer();
 }
 
 
@@ -327,7 +326,7 @@ static void services_init(void)
  *
  * @param[in] p_evt  Event received from the Connection Parameters Module.
  */
-static void on_conn_params_evt(ble_conn_params_evt_t * p_evt)
+static void on_conn_params_evt(ble_conn_params_evt_t *p_evt)
 {
     ret_code_t err_code;
 
@@ -380,7 +379,7 @@ static void application_timers_start(void)
        ret_code_t err_code;
        err_code = app_timer_start(m_app_timer_id, TIMER_INTERVAL, NULL);
        APP_ERROR_CHECK(err_code); */
-		//StartTestTimer();
+    //StartTestTimer();
 }
 
 
@@ -417,18 +416,18 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt)
 
     switch (ble_adv_evt)
     {
-        case BLE_ADV_EVT_FAST:
-            NRF_LOG_INFO("Fast advertising.");
-            err_code = bsp_indication_set(BSP_INDICATE_ADVERTISING);
-            APP_ERROR_CHECK(err_code);
-            break;
+    case BLE_ADV_EVT_FAST:
+        NRF_LOG_INFO("Fast advertising.");
+        err_code = bsp_indication_set(BSP_INDICATE_ADVERTISING);
+        APP_ERROR_CHECK(err_code);
+        break;
 
-        case BLE_ADV_EVT_IDLE:
-            sleep_mode_enter();
-            break;
+    case BLE_ADV_EVT_IDLE:
+        sleep_mode_enter();
+        break;
 
-        default:
-            break;
+    default:
+        break;
     }
 }
 
@@ -438,57 +437,58 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt)
  * @param[in]   p_ble_evt   Bluetooth stack event.
  * @param[in]   p_context   Unused.
  */
-static void ble_evt_handler(ble_evt_t const * p_ble_evt, void * p_context)
+static void ble_evt_handler(ble_evt_t const *p_ble_evt, void *p_context)
 {
     ret_code_t err_code = NRF_SUCCESS;
 
     switch (p_ble_evt->header.evt_id)
     {
-        case BLE_GAP_EVT_DISCONNECTED:
-            NRF_LOG_INFO("Disconnected.");
-            // LED indication will be changed when advertising starts.
-            break;
+    case BLE_GAP_EVT_DISCONNECTED:
+        NRF_LOG_INFO("Disconnected.");
+        // LED indication will be changed when advertising starts.
+        break;
 
-        case BLE_GAP_EVT_CONNECTED:
-            NRF_LOG_INFO("Connected.");
-            err_code = bsp_indication_set(BSP_INDICATE_CONNECTED);
-            APP_ERROR_CHECK(err_code);
-            m_conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
-            err_code = nrf_ble_qwr_conn_handle_assign(&m_qwr, m_conn_handle);
-            APP_ERROR_CHECK(err_code);
-            break;
+    case BLE_GAP_EVT_CONNECTED:
+        NRF_LOG_INFO("Connected.");
+        err_code = bsp_indication_set(BSP_INDICATE_CONNECTED);
+        APP_ERROR_CHECK(err_code);
+        m_conn_handle = p_ble_evt->evt.gap_evt.conn_handle;
+        err_code = nrf_ble_qwr_conn_handle_assign(&m_qwr, m_conn_handle);
+        APP_ERROR_CHECK(err_code);
+        break;
 
-        case BLE_GAP_EVT_PHY_UPDATE_REQUEST:
+    case BLE_GAP_EVT_PHY_UPDATE_REQUEST:
+    {
+        NRF_LOG_DEBUG("PHY update request.");
+        ble_gap_phys_t const phys =
         {
-            NRF_LOG_DEBUG("PHY update request.");
-            ble_gap_phys_t const phys =
-            {
-                .rx_phys = BLE_GAP_PHY_AUTO,
-                .tx_phys = BLE_GAP_PHY_AUTO,
-            };
-            err_code = sd_ble_gap_phy_update(p_ble_evt->evt.gap_evt.conn_handle, &phys);
-            APP_ERROR_CHECK(err_code);
-        } break;
+            .rx_phys = BLE_GAP_PHY_AUTO,
+            .tx_phys = BLE_GAP_PHY_AUTO,
+        };
+        err_code = sd_ble_gap_phy_update(p_ble_evt->evt.gap_evt.conn_handle, &phys);
+        APP_ERROR_CHECK(err_code);
+    }
+    break;
 
-        case BLE_GATTC_EVT_TIMEOUT:
-            // Disconnect on GATT Client timeout event.
-            NRF_LOG_DEBUG("GATT Client Timeout.");
-            err_code = sd_ble_gap_disconnect(p_ble_evt->evt.gattc_evt.conn_handle,
-                                             BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
-            APP_ERROR_CHECK(err_code);
-            break;
+    case BLE_GATTC_EVT_TIMEOUT:
+        // Disconnect on GATT Client timeout event.
+        NRF_LOG_DEBUG("GATT Client Timeout.");
+        err_code = sd_ble_gap_disconnect(p_ble_evt->evt.gattc_evt.conn_handle,
+                                         BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
+        APP_ERROR_CHECK(err_code);
+        break;
 
-        case BLE_GATTS_EVT_TIMEOUT:
-            // Disconnect on GATT Server timeout event.
-            NRF_LOG_DEBUG("GATT Server Timeout.");
-            err_code = sd_ble_gap_disconnect(p_ble_evt->evt.gatts_evt.conn_handle,
-                                             BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
-            APP_ERROR_CHECK(err_code);
-            break;
+    case BLE_GATTS_EVT_TIMEOUT:
+        // Disconnect on GATT Server timeout event.
+        NRF_LOG_DEBUG("GATT Server Timeout.");
+        err_code = sd_ble_gap_disconnect(p_ble_evt->evt.gatts_evt.conn_handle,
+                                         BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
+        APP_ERROR_CHECK(err_code);
+        break;
 
-        default:
-            // No implementation needed.
-            break;
+    default:
+        // No implementation needed.
+        break;
     }
 }
 
@@ -576,32 +576,44 @@ static void bsp_event_handler(bsp_event_t event)
 
     switch (event)
     {
-        case BSP_EVENT_SLEEP:
-            sleep_mode_enter();
-            break; // BSP_EVENT_SLEEP
+    case BSP_EVENT_KEY_1:
+        NRF_LOG_INFO("Template GPIO_IRQ1_CP.");
+        break; // 
+		
+    case BSP_EVENT_KEY_2:
+        NRF_LOG_INFO("Template GPIO_IRQ2_CP.");
+        break; // 
+		
+    case BSP_EVENT_KEY_3:
+        NRF_LOG_INFO("Template GPIO_IRQ3_CP.");
+        break; // 
+		
+    case BSP_EVENT_SLEEP:
+        sleep_mode_enter();
+        break; // BSP_EVENT_SLEEP
 
-        case BSP_EVENT_DISCONNECT:
-            err_code = sd_ble_gap_disconnect(m_conn_handle,
-                                             BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
+    case BSP_EVENT_DISCONNECT:
+        err_code = sd_ble_gap_disconnect(m_conn_handle,
+                                         BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
+        if (err_code != NRF_ERROR_INVALID_STATE)
+        {
+            APP_ERROR_CHECK(err_code);
+        }
+        break; // BSP_EVENT_DISCONNECT
+
+    case BSP_EVENT_WHITELIST_OFF:
+        if (m_conn_handle == BLE_CONN_HANDLE_INVALID)
+        {
+            err_code = ble_advertising_restart_without_whitelist(&m_advertising);
             if (err_code != NRF_ERROR_INVALID_STATE)
             {
                 APP_ERROR_CHECK(err_code);
             }
-            break; // BSP_EVENT_DISCONNECT
+        }
+        break; // BSP_EVENT_KEY_0
 
-        case BSP_EVENT_WHITELIST_OFF:
-            if (m_conn_handle == BLE_CONN_HANDLE_INVALID)
-            {
-                err_code = ble_advertising_restart_without_whitelist(&m_advertising);
-                if (err_code != NRF_ERROR_INVALID_STATE)
-                {
-                    APP_ERROR_CHECK(err_code);
-                }
-            }
-            break; // BSP_EVENT_KEY_0
-
-        default:
-            break;
+    default:
+        break;
     }
 }
 
@@ -638,7 +650,7 @@ static void advertising_init(void)
  *
  * @param[out] p_erase_bonds  Will be true if the clear bonding button was pressed to wake the application up.
  */
-static void buttons_leds_init(bool * p_erase_bonds)
+static void buttons_leds_init(bool *p_erase_bonds)
 {
     ret_code_t err_code;
     bsp_event_t startup_event;
@@ -712,15 +724,16 @@ int main(void)
     bool erase_bonds;
 
     // Initialize.
-	
-	
-/***********************************************************************************/
+
+
+    /***********************************************************************************/
     log_init();
     timers_init();
     buttons_leds_init(&erase_bonds);
-		Board_LED0Init();
-/***********************************************************************************/
+    Board_LED0Init();
 	
+    /***********************************************************************************/
+
     power_management_init();
     ble_stack_init();
     gap_params_init();
@@ -729,9 +742,9 @@ int main(void)
     services_init();
     conn_params_init();
     peer_manager_init();
-		
-/**********************************************************************************/
-		
+
+    /**********************************************************************************/
+
     // Start execution.
     NRF_LOG_INFO("Template example started.");
     application_timers_start();

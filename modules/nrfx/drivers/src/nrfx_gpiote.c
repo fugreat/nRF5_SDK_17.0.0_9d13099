@@ -927,6 +927,16 @@ void nrfx_gpiote_irq_handler(void)
     {
         port_event_handle(input);
     }
+		nrf_gpiote_event_clear(NRF_GPIOTE_EVENTS_PORT); //清中断事件
+
+////判断当前按键电平，设置触发电平
+
+    if(nrf_gpio_pin_read(14))
+		{
+        nrf_gpio_cfg_sense_set(14, NRF_GPIO_PIN_SENSE_LOW);
+				NRF_LOG_INFO("Template gpio——cp");
+		}
+
 }
 
 

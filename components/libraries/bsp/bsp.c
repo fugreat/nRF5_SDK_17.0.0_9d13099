@@ -487,7 +487,7 @@ uint32_t bsp_init(uint32_t type, bsp_event_callback_t callback)
 #endif // LEDS_NUMBER > 0 && !(defined BSP_SIMPLE)
 
 #if (BUTTONS_NUMBER > 0) && !(defined BSP_SIMPLE)
-    m_registered_callback = callback;
+    m_registered_callback = callback;//把bsp_event_handler注册成回调函数
 
     // BSP will support buttons and generate events
     if (type & BSP_INIT_BUTTONS)
@@ -497,6 +497,12 @@ uint32_t bsp_init(uint32_t type, bsp_event_callback_t callback)
         for (num = 0; ((num < BUTTONS_NUMBER) && (err_code == NRF_SUCCESS)); num++)
         {
             err_code = bsp_event_to_button_action_assign(num, BSP_BUTTON_ACTION_PUSH, BSP_EVENT_DEFAULT);
+					/*uint32_t bsp_event_to_button_action_assign ( uint32_t button, bsp_button_action_t action, bsp_event_t event)
+					为按键分配特定的事件。该函数允许为按键重新分配标准的事件，为了解除按键分配的事件，BSP 事件中专门提供了 
+					BSP_EVENT_NOTHING 事件，将他分配给按键后，按键将不会再产生事件。
+					[in] button：分配事件的按键 ID。[in] action：指定按键分配事件的动作。[in] event：分配给按键的事件。
+					NRF_SUCCESS：事件分配成功。NRF_ERROR_INVALID_PARAM：指定的按键 ID 或按键动作是无效的(未定义的)。
+					*/
         }
 
         if (err_code == NRF_SUCCESS)
@@ -512,7 +518,7 @@ uint32_t bsp_init(uint32_t type, bsp_event_callback_t callback)
         }
 
         if (err_code == NRF_SUCCESS)
-        {
+        {//此处为长按键检测timer
             err_code = app_timer_create(&m_bsp_button_tmr,
                                         APP_TIMER_MODE_SINGLE_SHOT,
                                         button_timer_handler);
@@ -560,7 +566,14 @@ uint32_t bsp_event_to_button_action_assign(uint32_t button, bsp_button_action_t 
         if (event == BSP_EVENT_DEFAULT)
         {
             // Setting default action: BSP_EVENT_KEY_x for PUSH actions, BSP_EVENT_NOTHING for RELEASE and LONG_PUSH actions.
-            event = (action == BSP_BUTTON_ACTION_PUSH) ? (bsp_event_t)(BSP_EVENT_KEY_0 + button) : BSP_EVENT_NOTHING;
+//            event = (action == BSP_BUTTON_ACTION_PUSH) ? (bsp_event_t)(BSP_EVENT_KEY_0 + button) : BSP_EVENT_NOTHING;
+					event = (bsp_event_t)(BSP_EVENT_KEY_0 + button);
+					/*
+					event0=14+0
+					event0=14+1
+					event0=14+2
+					event0=14+3
+					*/
         }
         switch (action)
         {
