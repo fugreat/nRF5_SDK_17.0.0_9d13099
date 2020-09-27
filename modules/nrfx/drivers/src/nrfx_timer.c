@@ -62,10 +62,10 @@ typedef struct
 } timer_control_block_t;
 
 static timer_control_block_t m_cb[NRFX_TIMER_ENABLED_COUNT];
-
-nrfx_err_t nrfx_timer_init(nrfx_timer_t const * const  p_instance,
-                           nrfx_timer_config_t const * p_config,
-                           nrfx_timer_event_handler_t  timer_event_handler)
+/**函数功能：初始化定时器**/
+nrfx_err_t nrfx_timer_init(nrfx_timer_t const * const  p_instance,//指向定时器驱动程序实例结构体的指针
+                           nrfx_timer_config_t const * p_config,//初始化结构体，如果是NULL，使用默认配置参数
+                           nrfx_timer_event_handler_t  timer_event_handler)//事件句柄，不能为NULL
 {
     timer_control_block_t * p_cb = &m_cb[p_instance->instance_id];
 #ifdef SOFTDEVICE_PRESENT
