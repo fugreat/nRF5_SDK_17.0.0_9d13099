@@ -733,7 +733,7 @@ int main(void)
     timers_init();
     buttons_leds_init(&erase_bonds);
     Board_LED0Init();
-		SPI_Init();
+    SPI_Init();
     /***********************************************************************************/
 
     power_management_init();
