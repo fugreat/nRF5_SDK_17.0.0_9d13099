@@ -105,3 +105,4 @@
 .\_build\main.o: ..\..\..\..\..\bsp\template\bsp_list.h
 .\_build\main.o: ..\..\..\..\..\bsp\template\board_spi.h
 .\_build\main.o: ..\..\..\..\..\bsp\template\board_spi.h
+.\_build\main.o: ..\..\..\..\..\bsp\template\board_adc.h

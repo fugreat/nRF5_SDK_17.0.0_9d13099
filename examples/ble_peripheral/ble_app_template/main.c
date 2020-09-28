@@ -86,7 +86,7 @@
 #include "bsp_led.h"
 #include "bsp_list.h"
 #include "board_spi.h"
-
+#include "board_adc.h"
 
 #define DEVICE_NAME                     "Nordic_Template"                       /**< Name of device. Will be included in the advertising data. */
 #define MANUFACTURER_NAME               "NordicSemiconductor"                   /**< Manufacturer. Will be passed to Device Information Service. */
@@ -734,6 +734,7 @@ int main(void)
     buttons_leds_init(&erase_bonds);
     Board_LED0Init();
     SPI_Init();
+		ADC_Init();
     /***********************************************************************************/
 
     power_management_init();
@@ -752,6 +753,8 @@ int main(void)
     application_timers_start();
 
     advertising_start(erase_bonds);
+		
+		ADC_Disable();	
 
     // Enter main loop.
     for (;;)
