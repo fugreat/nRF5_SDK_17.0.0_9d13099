@@ -2154,6 +2154,36 @@
                 </FileArmAds>
               </FileOption>
             </File>
+            <File>
+              <FileName>nrfx_timer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\modules\nrfx\drivers\src\nrfx_timer.c</FilePath>
+            </File>
+            <File>
+              <FileName>nrfx_spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\modules\nrfx\drivers\src\nrfx_spi.c</FilePath>
+            </File>
+            <File>
+              <FileName>nrfx_spim.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\modules\nrfx\drivers\src\nrfx_spim.c</FilePath>
+            </File>
+            <File>
+              <FileName>nrf_drv_spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\integration\nrfx\legacy\nrf_drv_spi.c</FilePath>
+            </File>
+            <File>
+              <FileName>nrfx_adc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\modules\nrfx\drivers\src\nrfx_adc.c</FilePath>
+            </File>
+            <File>
+              <FileName>nrfx_saadc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\modules\nrfx\drivers\src\nrfx_saadc.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -4377,6 +4407,16 @@
               <FileName>bsp_list.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\bsp\template\bsp_list.c</FilePath>
+            </File>
+            <File>
+              <FileName>board_spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\bsp\template\board_spi.c</FilePath>
+            </File>
+            <File>
+              <FileName>board_adc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\bsp\template\board_adc.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -6536,6 +6576,36 @@
                 </FileArmAds>
               </FileOption>
             </File>
+            <File>
+              <FileName>nrfx_timer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\modules\nrfx\drivers\src\nrfx_timer.c</FilePath>
+            </File>
+            <File>
+              <FileName>nrfx_spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\modules\nrfx\drivers\src\nrfx_spi.c</FilePath>
+            </File>
+            <File>
+              <FileName>nrfx_spim.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\modules\nrfx\drivers\src\nrfx_spim.c</FilePath>
+            </File>
+            <File>
+              <FileName>nrf_drv_spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\integration\nrfx\legacy\nrf_drv_spi.c</FilePath>
+            </File>
+            <File>
+              <FileName>nrfx_adc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\modules\nrfx\drivers\src\nrfx_adc.c</FilePath>
+            </File>
+            <File>
+              <FileName>nrfx_saadc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\modules\nrfx\drivers\src\nrfx_saadc.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -8759,6 +8829,16 @@
               <FileName>bsp_list.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\bsp\template\bsp_list.c</FilePath>
+            </File>
+            <File>
+              <FileName>board_spi.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\bsp\template\board_spi.c</FilePath>
+            </File>
+            <File>
+              <FileName>board_adc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\bsp\template\board_adc.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -6,6 +6,11 @@
 #include "nrf_log.h"
 #include "nrf_log_ctrl.h"
 #include "nrf_log_default_backends.h"
+#include "board_spi.h"
+
+
+
+
 static void timer_testCallback(void *arg);
 
 /*********************************************************************
@@ -60,4 +65,7 @@ static void timer_testCallback(void *arg)
     UNUSED_PARAMETER(arg);
     // 在这里加入自己的应用处理
     NRF_LOG_INFO("Template TIMER_CP.");
+		uint8_t temp[1] = {0x01};
+		SPI_ReadWriteData(temp, NULL, sizeof(uint8_t));
+
 }
