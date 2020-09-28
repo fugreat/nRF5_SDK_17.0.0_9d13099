@@ -49,3 +49,5 @@
 .\_build\bsp_timer.o: ..\..\..\..\..\..\components\softdevice\s132\headers\nrf_error_soc.h
 .\_build\bsp_timer.o: ..\..\..\..\..\..\components\softdevice\s132\headers\nrf_nvic.h
 .\_build\bsp_timer.o: ..\..\..\..\..\..\components\libraries\log\nrf_log_default_backends.h
+.\_build\bsp_timer.o: ..\..\..\..\..\bsp\template\board_spi.h
+.\_build\bsp_timer.o: ..\..\..\..\..\bsp\template\board_spi.h
