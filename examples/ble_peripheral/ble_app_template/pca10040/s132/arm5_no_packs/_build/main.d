@@ -105,4 +105,5 @@
 .\_build\main.o: ..\..\..\..\..\bsp\template\bsp_list.h
 .\_build\main.o: ..\..\..\..\..\bsp\template\board_spi.h
 .\_build\main.o: ..\..\..\..\..\bsp\template\board_spi.h
-.\_build\main.o: ..\..\..\..\..\bsp\template\board_adc.h
+.\_build\main.o: ..\..\..\..\..\..\components\ble\ble_services\ble_dis\ble_dis.h
+.\_build\main.o: ..\..\..\..\..\..\components\ble\ble_services\ble_hrs\ble_hrs.h

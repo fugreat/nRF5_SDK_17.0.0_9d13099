@@ -87,7 +87,6 @@ static void adcCallbackFunc(nrf_drv_saadc_evt_t const* pEvent)
 	{
 		nrf_saadc_value_t adcResult;
 		uint16_t batteryVoltage;
-		uint8_t batteryPercentage;
 		ret_code_t errCode;
 
 		// 设置好缓存，为下次转换缓冲做准备，并且把导入到缓冲的值提取出来
@@ -96,6 +95,7 @@ static void adcCallbackFunc(nrf_drv_saadc_evt_t const* pEvent)
 		adcResult = pEvent->data.done.p_buffer[0];
 		// 电池电压转换计算
 		batteryVoltage = ADC_RESULT_IN_MILLI_VOLTS(adcResult);
+		NRF_LOG_INFO("Template ADC_CP.");
 	}
 }
 

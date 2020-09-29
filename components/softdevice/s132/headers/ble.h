@@ -212,14 +212,14 @@ typedef struct
 /**@brief Common BLE Event type, wrapping the module specific event reports. */
 typedef struct
 {
-  ble_evt_hdr_t header;           /**< Event header. */
+  ble_evt_hdr_t header;           /**< 事件头，用来标志事件的类型 Event header. */
   union
   {
-    ble_common_evt_t  common_evt; /**< Common Event, evt_id in BLE_EVT_* series. */
-    ble_gap_evt_t     gap_evt;    /**< GAP originated event, evt_id in BLE_GAP_EVT_* series. */
-    ble_gattc_evt_t   gattc_evt;  /**< GATT client originated event, evt_id in BLE_GATTC_EVT* series. */
-    ble_gatts_evt_t   gatts_evt;  /**< GATT server originated event, evt_id in BLE_GATTS_EVT* series. */
-    ble_l2cap_evt_t   l2cap_evt;  /**< L2CAP originated event, evt_id in BLE_L2CAP_EVT* series. */
+    ble_common_evt_t  common_evt; /**< 通用事件 事件ID前缀BLE_EVT_ 	Common Event, evt_id in BLE_EVT_* series. */
+    ble_gap_evt_t     gap_evt;    /**< GAP事件											GAP originated event, evt_id in BLE_GAP_EVT_* series. */
+    ble_gattc_evt_t   gattc_evt;  /**< GATT客户端事件								GATT client originated event, evt_id in BLE_GATTC_EVT* series. */
+    ble_gatts_evt_t   gatts_evt;  /**< GATT服务端事件								GATT server originated event, evt_id in BLE_GATTS_EVT* series. */
+    ble_l2cap_evt_t   l2cap_evt;  /**< L2CAP事件										L2CAP originated event, evt_id in BLE_L2CAP_EVT* series. */
   } evt;                          /**< Event union. */
 } ble_evt_t;
 
