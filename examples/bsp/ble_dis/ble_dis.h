@@ -98,16 +98,16 @@ typedef struct
  */
 typedef struct
 {
-    ble_srv_utf8_str_t             manufact_name_str;           /**< Manufacturer Name String. */
-    ble_srv_utf8_str_t             model_num_str;               /**< Model Number String. */
-    ble_srv_utf8_str_t             serial_num_str;              /**< Serial Number String. */
-    ble_srv_utf8_str_t             hw_rev_str;                  /**< Hardware Revision String. */
-    ble_srv_utf8_str_t             fw_rev_str;                  /**< Firmware Revision String. */
-    ble_srv_utf8_str_t             sw_rev_str;                  /**< Software Revision String. */
-    ble_dis_sys_id_t *             p_sys_id;                    /**< System ID. */
-    ble_dis_reg_cert_data_list_t * p_reg_cert_data_list;        /**< IEEE 11073-20601 Regulatory Certification Data List. */
-    ble_dis_pnp_id_t *             p_pnp_id;                    /**< PnP ID. */
-    security_req_t                 dis_char_rd_sec;             /**< Security requirement for reading any DIS characteristic value. */
+    ble_srv_utf8_str_t             manufact_name_str;           //制造商名称字符串		/**< Manufacturer Name String. */
+    ble_srv_utf8_str_t             model_num_str;               //型号字符串					/**< Model Number String. */
+    ble_srv_utf8_str_t             serial_num_str;              //序列号字符串				/**< Serial Number String. */
+    ble_srv_utf8_str_t             hw_rev_str;                  //硬件版本字符串			/**< Hardware Revision String. */
+    ble_srv_utf8_str_t             fw_rev_str;                  //固件版本字符串			/**< Firmware Revision String. */
+    ble_srv_utf8_str_t             sw_rev_str;                  //软件版本字符串			/**< Software Revision String. */
+    ble_dis_sys_id_t *             p_sys_id;                    //SYSTEM  ID					/**< System ID. */
+    ble_dis_reg_cert_data_list_t * p_reg_cert_data_list;        //IEEE  11073-20601 监管认证列表	/**< IEEE 11073-20601 Regulatory Certification Data List. */
+    ble_dis_pnp_id_t *             p_pnp_id;                    //PnP  ID							/**< PnP ID. */
+    security_req_t                 dis_char_rd_sec;             //读DIS特征值时的需求	/**< Security requirement for reading any DIS characteristic value. */
 } ble_dis_init_t;
 
 /**@brief Function for initializing the Device Information Service.

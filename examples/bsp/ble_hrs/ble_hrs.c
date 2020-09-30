@@ -46,7 +46,7 @@
 #include "ble_hrs.h"
 #include <string.h>
 #include "ble_srv_common.h"
-
+#include "nrf_log.h"
 
 #define OPCODE_LENGTH 1                                                              /**< Length of opcode inside Heart Rate Measurement packet. */
 #define HANDLE_LENGTH 2                                                              /**< Length of handle inside Heart Rate Measurement packet. */
@@ -98,7 +98,6 @@ static void on_hrm_cccd_write(ble_hrs_t *p_hrs, ble_gatts_evt_write_t const *p_e
         if (p_hrs->evt_handler != NULL)
         {
             ble_hrs_evt_t evt;
-
             if (ble_srv_is_notification_enabled(p_evt_write->data))
             {
                 evt.evt_type = BLE_HRS_EVT_NOTIFICATION_ENABLED;
@@ -122,7 +121,6 @@ static void on_hrm_cccd_write(ble_hrs_t *p_hrs, ble_gatts_evt_write_t const *p_e
 static void on_write(ble_hrs_t *p_hrs, ble_evt_t const *p_ble_evt)
 {
     ble_gatts_evt_write_t const *p_evt_write = &p_ble_evt->evt.gatts_evt.params.write;
-
     if (p_evt_write->handle == p_hrs->hrm_handles.cccd_handle)
     {
         on_hrm_cccd_write(p_hrs, p_evt_write);
@@ -225,7 +223,7 @@ uint32_t ble_hrs_init(ble_hrs_t *p_hrs, const ble_hrs_init_t *p_hrs_init)
 	//定义特征参数结构变量
     ble_add_char_params_t add_char_params;
     uint8_t               encoded_initial_hrm[MAX_HRM_LEN];
-//初始化心率服务结构体
+	//初始化心率服务结构体
 	//拷贝心率服务初始化结构体中的心率服务事件句柄
     // Initialize service structure
     p_hrs->evt_handler                 = p_hrs_init->evt_handler;
@@ -239,10 +237,10 @@ uint32_t ble_hrs_init(ble_hrs_t *p_hrs, const ble_hrs_init_t *p_hrs_init)
     p_hrs->rr_interval_count           = 0;
 	//设置当前一次可发送的最大心率测量数据长度
     p_hrs->max_hrm_len                 = MAX_HRM_LEN;
-//心率服务的UUID
+	//心率服务的UUID
     // Add service
-    BLE_UUID_BLE_ASSIGN(ble_uuid, BLE_UUID_HEART_RATE_SERVICE);
-//添加服务到属性表
+    BLE_UUID_BLE_ASSIGN(ble_uuid, BLE_UUID_HEART_RATE_SERVICE);											//	0x180D
+	//添加服务到属性表
     err_code = sd_ble_gatts_service_add(BLE_GATTS_SRVC_TYPE_PRIMARY,
                                         &ble_uuid,
                                         &p_hrs->service_handle);
@@ -255,7 +253,7 @@ uint32_t ble_hrs_init(ble_hrs_t *p_hrs, const ble_hrs_init_t *p_hrs_init)
     // Add heart rate measurement characteristic
     memset(&add_char_params, 0, sizeof(add_char_params));
 		//心率测量特征的UUID
-    add_char_params.uuid              = BLE_UUID_HEART_RATE_MEASUREMENT_CHAR;
+    add_char_params.uuid              = BLE_UUID_HEART_RATE_MEASUREMENT_CHAR;					//	0x2A37
 		//设置心率测量特征值的最大长度
     add_char_params.max_len           = MAX_HRM_LEN;
 		//设置心率测量特征值的初始长度
@@ -265,7 +263,7 @@ uint32_t ble_hrs_init(ble_hrs_t *p_hrs, const ble_hrs_init_t *p_hrs_init)
     add_char_params.is_var_len        = true;
 		//设置心率测量特征值的性质：支持通知
     add_char_params.char_props.notify = 1;
-    add_char_params.cccd_write_access = p_hrs_init->hrm_cccd_wr_sec;
+    add_char_params.cccd_write_access = p_hrs_init->hrm_cccd_wr_sec;								//可读可写
 		//为心率服务添加心率测量特征
     err_code = characteristic_add(p_hrs->service_handle, &add_char_params, &(p_hrs->hrm_handles));
     if (err_code != NRF_SUCCESS)
@@ -278,7 +276,7 @@ uint32_t ble_hrs_init(ble_hrs_t *p_hrs, const ble_hrs_init_t *p_hrs_init)
       //Add body sensor location characteristic
         memset(&add_char_params, 0, sizeof(add_char_params));
 			//设置传感器位置特征的UUID
-        add_char_params.uuid            = BLE_UUID_BODY_SENSOR_LOCATION_CHAR;
+        add_char_params.uuid            = BLE_UUID_BODY_SENSOR_LOCATION_CHAR;				//	0x2A38
 			//设置心率测量特征值的最大长度
         add_char_params.max_len         = sizeof(uint8_t);
 			//设置心率测量特征值的初始长度
@@ -288,7 +286,7 @@ uint32_t ble_hrs_init(ble_hrs_t *p_hrs, const ble_hrs_init_t *p_hrs_init)
 			//设置传感器的位置特征的性质： 支持读取
         add_char_params.char_props.read = 1;
 			//设置读传感器位置特征的安全需求
-        add_char_params.read_access     = p_hrs_init->bsl_rd_sec;
+        add_char_params.read_access     = p_hrs_init->bsl_rd_sec;										//只读
 			//为心率服务添加心率测量特征
         err_code = characteristic_add(p_hrs->service_handle, &add_char_params, &(p_hrs->bsl_handles));
         if (err_code != NRF_SUCCESS)
@@ -300,35 +298,45 @@ uint32_t ble_hrs_init(ble_hrs_t *p_hrs, const ble_hrs_init_t *p_hrs_init)
     return NRF_SUCCESS;
 }
 
-
 uint32_t ble_hrs_heart_rate_measurement_send(ble_hrs_t *p_hrs, uint16_t heart_rate)
 {
     uint32_t err_code;
-
+		static uint8_t  rr_val=0;
+		uint8_t flags=0x15;
     // Send value if connected and notifying
     if (p_hrs->conn_handle != BLE_CONN_HANDLE_INVALID)
-    {
-        uint8_t                encoded_hrm[MAX_HRM_LEN];
-        uint16_t               len;
+    {	
         uint16_t               hvx_len;
+				uint8_t   hrm_data[1+2+6];
+
         ble_gatts_hvx_params_t hvx_params;
 
-        len     = hrm_encode(p_hrs, heart_rate, encoded_hrm);
-        hvx_len = len;
+			if(p_hrs->is_sensor_contact_detected)
+			{
+			flags |=HRM_FLAG_MASK_SENSOR_CONTACT_DETECTED;
+			}
+			
+			hrm_data[0]=flags;
+			hrm_data[1]=heart_rate;
+			hrm_data[2]=flags;
+			hrm_data[3]=flags;
+			hrm_data[4]=flags;
+			hrm_data[5]=flags;
+			hrm_data[6]=flags;
+			hrm_data[7]=flags;
+			hrm_data[8]=flags;
 
-        memset(&hvx_params, 0, sizeof(hvx_params));
-
-        hvx_params.handle = p_hrs->hrm_handles.value_handle;
-        hvx_params.type   = BLE_GATT_HVX_NOTIFICATION;
-        hvx_params.offset = 0;
-        hvx_params.p_len  = &hvx_len;
-        hvx_params.p_data = encoded_hrm;
-
-        err_code = sd_ble_gatts_hvx(p_hrs->conn_handle, &hvx_params);
-        if ((err_code == NRF_SUCCESS) && (hvx_len != len))
-        {
-            err_code = NRF_ERROR_DATA_SIZE;
-        }
+			rr_val++;
+			hvx_len=1+2+6;
+			
+			memset(&hvx_params,0,sizeof(hvx_params));
+			hvx_params.handle=p_hrs->hrm_handles.value_handle;
+			hvx_params.type=BLE_GATT_HVX_NOTIFICATION;
+			hvx_params.offset=0;
+			hvx_params.p_len=&hvx_len;
+			hvx_params.p_data=hrm_data;
+			
+			err_code=sd_ble_gatts_hvx(p_hrs->conn_handle,&hvx_params);
     }
     else
     {

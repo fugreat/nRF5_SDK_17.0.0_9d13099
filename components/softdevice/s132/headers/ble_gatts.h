@@ -286,11 +286,11 @@ typedef struct
 /**@brief GATT HVx parameters. */
 typedef struct
 {
-  uint16_t          handle;             /**< Characteristic Value Handle. */
-  uint8_t           type;               /**< Indication or Notification, see @ref BLE_GATT_HVX_TYPES. */
-  uint16_t          offset;             /**< Offset within the attribute value. */
-  uint16_t         *p_len;              /**< Length in bytes to be written, length in bytes written after return. */
-  uint8_t const    *p_data;             /**< Actual data content, use NULL to use the current attribute value. */
+  uint16_t          handle;             // 特征值句柄																		/**< Characteristic Value Handle. */
+  uint8_t           type;               //类型：通知或者是指示													/**< Indication or Notification, see @ref BLE_GATT_HVX_TYPES. */
+  uint16_t          offset;             //属性值内的偏移量															/**< Offset within the attribute value. */
+  uint16_t         *p_len;              //待写入的数据的字节数，返回写入数据的字节数		/**< Length in bytes to be written, length in bytes written after return. */
+  uint8_t const    *p_data;             //实际的数据的内容，如为null则使用当前的属性值	/**< Actual data content, use NULL to use the current attribute value. */
 } ble_gatts_hvx_params_t;
 
 /**@brief GATT Authorization parameters. */

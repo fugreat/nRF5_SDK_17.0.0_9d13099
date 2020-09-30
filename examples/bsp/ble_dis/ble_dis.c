@@ -127,20 +127,27 @@ static uint32_t char_add(uint16_t                        uuid,
                          security_req_t const            rd_sec,
                          ble_gatts_char_handles_t      * p_handles)
 {
+	
+	//定义特征参数结构体变量
     ble_add_char_params_t add_char_params;
-
+	//检查指向制造商名称的字符串是否有效
     APP_ERROR_CHECK_BOOL(p_char_value != NULL);
+	//检查制造商的名称字符串是否大于0
     APP_ERROR_CHECK_BOOL(char_len > 0);
-
+	//结构体清0
     memset(&add_char_params, 0, sizeof(add_char_params));
-
+	//制造商名称字符串特征的UUID
     add_char_params.uuid            = uuid;
+	//设置制造商名称字符串特征值的最大长度
     add_char_params.max_len         = char_len;
+	//设置制造商名称字符串特征值的初始长度
     add_char_params.init_len        = char_len;
+	//设置制造商名称字符串特征值的初始值
     add_char_params.p_init_value    = p_char_value;
+	//设置制造商名称字符串特征值的性质，是否支持读取
     add_char_params.char_props.read = 1;
     add_char_params.read_access     = rd_sec;
-
+	//向设备信息服务中添加制造商名称字符串特征
     return characteristic_add(service_handle, &add_char_params, p_handles);
 }
 
@@ -148,20 +155,21 @@ static uint32_t char_add(uint16_t                        uuid,
 uint32_t ble_dis_init(ble_dis_init_t const * p_dis_init)
 {
     uint32_t   err_code;
-    ble_uuid_t ble_uuid;
+    ble_uuid_t ble_uuid;//定义UUID结构体变量
 
-    // Add service
+    // Add service设备信息服务的UUID
     BLE_UUID_BLE_ASSIGN(ble_uuid, BLE_UUID_DEVICE_INFORMATION_SERVICE);
-
+		//添加UUID到服务属性列表
     err_code = sd_ble_gatts_service_add(BLE_GATTS_SRVC_TYPE_PRIMARY, &ble_uuid, &service_handle);
     if (err_code != NRF_SUCCESS)
     {
         return err_code;
     }
 
-    // Add characteristics
+    // Add characteristics判断如果制造商的名称字符串大于0，则表示有效
     if (p_dis_init->manufact_name_str.length > 0)
     {
+			//添加制造商名称字符串特征
         err_code = char_add(BLE_UUID_MANUFACTURER_NAME_STRING_CHAR,
                             p_dis_init->manufact_name_str.p_str,
                             p_dis_init->manufact_name_str.length,
