@@ -59,11 +59,11 @@ extern "C" {
 typedef nrfx_saadc_config_t nrf_drv_saadc_config_t;
 
 /** @brief Macro for forwarding the new implementation. */
-#define NRF_DRV_SAADC_EVT_DONE          NRFX_SAADC_EVT_DONE
+#define NRF_DRV_SAADC_EVT_DONE          NRFX_SAADC_EVT_DONE//采样值填满缓冲是产生该事件
 /** @brief Macro for forwarding the new implementation. */
-#define NRF_DRV_SAADC_EVT_LIMIT         NRFX_SAADC_EVT_LIMIT
+#define NRF_DRV_SAADC_EVT_LIMIT         NRFX_SAADC_EVT_LIMIT//采样值达到门限值时产生该事件
 /** @brief Macro for forwarding the new implementation. */
-#define NRF_DRV_SAADC_EVT_CALIBRATEDONE NRFX_SAADC_EVT_CALIBRATEDONE
+#define NRF_DRV_SAADC_EVT_CALIBRATEDONE NRFX_SAADC_EVT_CALIBRATEDONE//校准完成后产生该事件
 /** @brief Macro for forwarding the new implementation. */
 #define nrf_drv_saadc_evt_type_t        nrfx_saadc_evt_type_t
 /** @brief Macro for forwarding the new implementation. */

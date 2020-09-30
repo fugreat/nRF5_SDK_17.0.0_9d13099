@@ -86,10 +86,12 @@
 #include "bsp_led.h"
 #include "bsp_list.h"
 #include "board_spi.h"
-#include "board_adc.h"
+#include "ble_dis.h"
+#include "ble_hrs.h"
 
-#define DEVICE_NAME                     "Nordic_Template"                       /**< Name of device. Will be included in the advertising data. */
-#define MANUFACTURER_NAME               "NordicSemiconductor"                   /**< Manufacturer. Will be passed to Device Information Service. */
+
+#define DEVICE_NAME                     "Nordic_Template_CP"                       /**< Name of device. Will be included in the advertising data. */
+#define MANUFACTURER_NAME               "VioLet Sky"                   /**< Manufacturer. Will be passed to Device Information Service. */
 #define APP_ADV_INTERVAL                300                                     /**< The advertising interval (in units of 0.625 ms. This value corresponds to 187.5 ms). */
 
 #define APP_ADV_DURATION                18000                                   /**< The advertising duration (180 seconds) in units of 10 milliseconds. */
@@ -116,13 +118,25 @@
 
 #define DEAD_BEEF                       0xDEADBEEF                              /**< Value used as error code on stack dump, can be used to identify stack location on stack unwind. */
 
+#define SENSOR_CONTACT_DETECTED_INTERVAL    APP_TIMER_TICKS(5000)                   /**< Sensor Contact Detected toggle interval (ticks). */
+#define HEART_RATE_MEAS_INTERVAL            APP_TIMER_TICKS(1000)                   /**< Heart rate measurement interval (ticks). */
 
+BLE_HRS_DEF(m_hrs);                //STEP   9                                   /**< Heart rate service instance. */
 NRF_BLE_GATT_DEF(m_gatt);                                                       /**< GATT module instance. */
 NRF_BLE_QWR_DEF(m_qwr);                                                         /**< Context for the Queued Write module.*/
 BLE_ADVERTISING_DEF(m_advertising);                                             /**< Advertising module instance. */
 
-static uint16_t m_conn_handle = BLE_CONN_HANDLE_INVALID;                        /**< Handle of the current connection. */
+APP_TIMER_DEF(m_sensor_contact_timer_id);                           /**< Sensor contact detected timer. */
 
+bool     m_rr_interval_enabled = true;                       /**< Flag for enabling and disabling the registration of new RR interval measurements (the purpose of disabling this is just to test sending HRM without RR interval data. */
+
+APP_TIMER_DEF(m_heart_rate_timer_id);                               /**< Heart rate measurement timer. */
+static uint16_t m_conn_handle         = BLE_CONN_HANDLE_INVALID;    /**< Handle of the current connection. */
+static sensorsim_cfg_t   m_heart_rate_sim_cfg;                      /**< Heart Rate sensor simulator configuration. */
+static sensorsim_state_t m_heart_rate_sim_state;                    /**< Heart Rate sensor simulator state. */
+//static sensorsim_state_t m_rr_interval_sim_state;                   /**< RR Interval sensor simulator state. */
+extern void sensor_contact_detected_timeout_handler(void *p_context);
+extern void heart_rate_meas_timeout_handler(void *p_context);
 /* YOUR_JOB: Declare all services structure your application is using
  *  BLE_XYZ_DEF(m_xyz);
  */
@@ -130,7 +144,8 @@ static uint16_t m_conn_handle = BLE_CONN_HANDLE_INVALID;                        
 // YOUR_JOB: Use UUIDs for service(s) used in your application.
 static ble_uuid_t m_adv_uuids[] =                                               /**< Universally unique service identifiers. */
 {
-    {BLE_UUID_DEVICE_INFORMATION_SERVICE, BLE_UUID_TYPE_BLE}
+    {BLE_UUID_DEVICE_INFORMATION_SERVICE, BLE_UUID_TYPE_BLE},       //180A
+    {BLE_UUID_HEART_RATE_SERVICE,                   BLE_UUID_TYPE_BLE}      //180D
 };
 
 
@@ -194,6 +209,17 @@ static void timers_init(void)
        ret_code_t err_code;
        err_code = app_timer_create(&m_app_timer_id, APP_TIMER_MODE_REPEATED, timer_timeout_handler);
        APP_ERROR_CHECK(err_code); */
+
+	
+	
+	  err_code = app_timer_create(&m_heart_rate_timer_id,
+                                APP_TIMER_MODE_REPEATED,
+                                heart_rate_meas_timeout_handler);
+    err_code = app_timer_create(&m_sensor_contact_timer_id, 
+																APP_TIMER_MODE_REPEATED, 
+																sensor_contact_detected_timeout_handler);
+    APP_ERROR_CHECK(err_code);
+
     CreateTestTimer();
 }
 
@@ -209,29 +235,72 @@ static void gap_params_init(void)
     ble_gap_conn_params_t   gap_conn_params;
     ble_gap_conn_sec_mode_t sec_mode;
 
+    //设置GAP的安全模式
     BLE_GAP_CONN_SEC_MODE_SET_OPEN(&sec_mode);
-
+    //设置设备名称
     err_code = sd_ble_gap_device_name_set(&sec_mode,
-                                          (const uint8_t *)DEVICE_NAME,
+                                          (const uint8_t *)DEVICE_NAME,     //设置蓝牙名字
                                           strlen(DEVICE_NAME));
     APP_ERROR_CHECK(err_code);
 
+
+
+    err_code = sd_ble_gap_appearance_set(BLE_APPEARANCE_HEART_RATE_SENSOR_HEART_RATE_BELT); //STEP   6
+    APP_ERROR_CHECK(err_code);
     /* YOUR_JOB: Use an appearance value matching the application's use case.
        err_code = sd_ble_gap_appearance_set(BLE_APPEARANCE_);
        APP_ERROR_CHECK(err_code); */
 
     memset(&gap_conn_params, 0, sizeof(gap_conn_params));
 
-    gap_conn_params.min_conn_interval = MIN_CONN_INTERVAL;
-    gap_conn_params.max_conn_interval = MAX_CONN_INTERVAL;
-    gap_conn_params.slave_latency     = SLAVE_LATENCY;
-    gap_conn_params.conn_sup_timeout  = CONN_SUP_TIMEOUT;
+    gap_conn_params.min_conn_interval = MIN_CONN_INTERVAL;//最小连接间隔
+    gap_conn_params.max_conn_interval = MAX_CONN_INTERVAL;//最大连接间隔
+    gap_conn_params.slave_latency     = SLAVE_LATENCY;      //从机延时
+    gap_conn_params.conn_sup_timeout  = CONN_SUP_TIMEOUT;   //监督超时
 
+    //调用协议栈的API接口配置GAP参数
     err_code = sd_ble_gap_ppcp_set(&gap_conn_params);
     APP_ERROR_CHECK(err_code);
 }
 
+void sensor_contact_detected_timeout_handler(void *p_context)
+{
+    static bool sensor_contact_detected = false;
+		NRF_LOG_INFO("hrs_c");
+    UNUSED_PARAMETER(p_context);
 
+    sensor_contact_detected = !sensor_contact_detected;
+    ble_hrs_sensor_contact_detected_update(&m_hrs, sensor_contact_detected);
+}
+
+
+static void heart_rate_meas_timeout_handler(void *p_context)
+{
+    static uint32_t cnt = 0;
+    ret_code_t      err_code;
+    uint16_t        heart_rate;
+
+    UNUSED_PARAMETER(p_context);
+
+    heart_rate = (uint16_t)sensorsim_measure(&m_heart_rate_sim_state, &m_heart_rate_sim_cfg);//通知发送函数
+
+    cnt++;
+    err_code = ble_hrs_heart_rate_measurement_send(&m_hrs, heart_rate);
+    if ((err_code != NRF_SUCCESS) &&
+            (err_code != NRF_ERROR_INVALID_STATE) &&
+            (err_code != NRF_ERROR_RESOURCES) &&
+            (err_code != NRF_ERROR_BUSY) &&
+            (err_code != BLE_ERROR_GATTS_SYS_ATTR_MISSING)
+       )
+    {
+        APP_ERROR_HANDLER(err_code);
+    }
+
+    // Disable RR Interval recording every third heart rate measurement.
+    // NOTE: An application will normally not do this. It is done here just for testing generation
+    // of messages without RR Interval measurements.
+    m_rr_interval_enabled = ((cnt % 3) != 0);
+}
 /**@brief Function for initializing the GATT module.
  */
 static void gatt_init(void)
@@ -296,25 +365,38 @@ static void services_init(void)
     /* YOUR_JOB: Add code to initialize the services used by the application.
        ble_xxs_init_t                     xxs_init;
        ble_yys_init_t                     yys_init;
-
-       // Initialize XXX Service.
-       memset(&xxs_init, 0, sizeof(xxs_init));
-
-       xxs_init.evt_handler                = NULL;
-       xxs_init.is_xxx_notify_supported    = true;
-       xxs_init.ble_xx_initial_value.level = 100;
-
-       err_code = ble_bas_init(&m_xxs, &xxs_init);
-       APP_ERROR_CHECK(err_code);
-
-       // Initialize YYY Service.
-       memset(&yys_init, 0, sizeof(yys_init));
-       yys_init.evt_handler                  = on_yys_evt;
-       yys_init.ble_yy_initial_value.counter = 0;
-
-       err_code = ble_yy_service_init(&yys_init, &yy_init);
-       APP_ERROR_CHECK(err_code);
      */
+    //STEP   8
+    ///////////////////////////////////////////////////////////////////////////////////////hrs
+    uint8_t            body_sensor_location;
+    ble_hrs_init_t     hrs_init;
+    body_sensor_location = BLE_HRS_BODY_SENSOR_LOCATION_FINGER;     //身体位置的数值    3
+
+    memset(&hrs_init, 0, sizeof(hrs_init));
+
+    hrs_init.evt_handler                 = NULL;
+    hrs_init.is_sensor_contact_supported = true;
+    hrs_init.p_body_sensor_location      = &body_sensor_location;
+
+    // Here the sec level for the Heart Rate Service can be changed/increased.
+    hrs_init.hrm_cccd_wr_sec = SEC_OPEN;//访问开放
+    hrs_init.bsl_rd_sec      = SEC_OPEN;
+
+    err_code = ble_hrs_init(&m_hrs, &hrs_init);//进行各项服务的初始化包括UUID
+    APP_ERROR_CHECK(err_code);
+
+    //////////////////////////////////////////////////////////////////////////////////////////server
+    ble_dis_init_t      dis_init;//定义设备信息服务初始化结构体
+
+    memset(&dis_init, 0, sizeof(dis_init)); //清零设备初始化结构体
+    ble_srv_ascii_to_utf8(&dis_init.manufact_name_str, (char *)MANUFACTURER_NAME);
+
+    dis_init.dis_char_rd_sec = SEC_OPEN;
+    err_code = ble_dis_init(&dis_init);
+    APP_ERROR_CHECK(err_code);
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
 }
 
 
@@ -360,9 +442,9 @@ static void conn_params_init(void)
     memset(&cp_init, 0, sizeof(cp_init));
 
     cp_init.p_conn_params                  = NULL;
-    cp_init.first_conn_params_update_delay = FIRST_CONN_PARAMS_UPDATE_DELAY;
-    cp_init.next_conn_params_update_delay  = NEXT_CONN_PARAMS_UPDATE_DELAY;
-    cp_init.max_conn_params_update_count   = MAX_CONN_PARAMS_UPDATE_COUNT;
+    cp_init.first_conn_params_update_delay = FIRST_CONN_PARAMS_UPDATE_DELAY;        //首次协商延时
+    cp_init.next_conn_params_update_delay  = NEXT_CONN_PARAMS_UPDATE_DELAY;         //每次协商之间的间隔
+    cp_init.max_conn_params_update_count   = MAX_CONN_PARAMS_UPDATE_COUNT;          //每次协商最大尝试次数
     cp_init.start_on_notify_cccd_handle    = BLE_GATT_HANDLE_INVALID;
     cp_init.disconnect_on_fail             = false;
     cp_init.evt_handler                    = on_conn_params_evt;
@@ -381,6 +463,11 @@ static void application_timers_start(void)
        ret_code_t err_code;
        err_code = app_timer_start(m_app_timer_id, TIMER_INTERVAL, NULL);
        APP_ERROR_CHECK(err_code); */
+		ret_code_t             err_code;
+	  err_code = app_timer_start(m_heart_rate_timer_id, HEART_RATE_MEAS_INTERVAL, NULL);
+    APP_ERROR_CHECK(err_code);
+	  err_code = app_timer_start(m_sensor_contact_timer_id, SENSOR_CONTACT_DETECTED_INTERVAL, NULL);
+    APP_ERROR_CHECK(err_code);
     StartTestTimer();
 }
 
@@ -445,12 +532,12 @@ static void ble_evt_handler(ble_evt_t const *p_ble_evt, void *p_context)
 
     switch (p_ble_evt->header.evt_id)
     {
-    case BLE_GAP_EVT_DISCONNECTED:
+    case BLE_GAP_EVT_DISCONNECTED:      //蓝牙断开连接事件
         NRF_LOG_INFO("Disconnected.");
         // LED indication will be changed when advertising starts.
         break;
 
-    case BLE_GAP_EVT_CONNECTED:
+    case BLE_GAP_EVT_CONNECTED:             //蓝牙建立连接事件
         NRF_LOG_INFO("Connected.");
         err_code = bsp_indication_set(BSP_INDICATE_CONNECTED);
         APP_ERROR_CHECK(err_code);
@@ -580,16 +667,16 @@ static void bsp_event_handler(bsp_event_t event)
     {
     case BSP_EVENT_KEY_1:
         NRF_LOG_INFO("Template GPIO_IRQ1_CP.");
-        break; // 
-		
+        break; //
+
     case BSP_EVENT_KEY_2:
         NRF_LOG_INFO("Template GPIO_IRQ2_CP.");
-        break; // 
-		
+        break; //
+
     case BSP_EVENT_KEY_3:
         NRF_LOG_INFO("Template GPIO_IRQ3_CP.");
-        break; // 
-		
+        break; //
+
     case BSP_EVENT_SLEEP:
         sleep_mode_enter();
         break; // BSP_EVENT_SLEEP
@@ -627,20 +714,23 @@ static void advertising_init(void)
     ret_code_t             err_code;
     ble_advertising_init_t init;
 
+
     memset(&init, 0, sizeof(init));
 
-    init.advdata.name_type               = BLE_ADVDATA_FULL_NAME;
-    init.advdata.include_appearance      = true;
-    init.advdata.flags                   = BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE;
-    init.advdata.uuids_complete.uuid_cnt = sizeof(m_adv_uuids) / sizeof(m_adv_uuids[0]);
-    init.advdata.uuids_complete.p_uuids  = m_adv_uuids;
+    init.advdata.name_type               = BLE_ADVDATA_FULL_NAME;       //设备名称全称              //STEP  1
+    init.advdata.include_appearance      = true;                                        //包含外观特征              //STEP  2
+    //设置蓝牙的可发现模式BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE一般可发现模式
+    init.advdata.flags                   = BLE_GAP_ADV_FLAGS_LE_ONLY_GENERAL_DISC_MODE;     //STEP  4
 
-    init.config.ble_adv_fast_enabled  = true;
-    init.config.ble_adv_fast_interval = APP_ADV_INTERVAL;
-    init.config.ble_adv_fast_timeout  = APP_ADV_DURATION;
+    init.advdata.uuids_complete.uuid_cnt = sizeof(m_adv_uuids) / sizeof(m_adv_uuids[0]);    //STEP  3       包含全部的UUID   //取消这两行为广播中包含部分的UUID
+    init.advdata.uuids_complete.p_uuids  = m_adv_uuids;//
 
+    init.config.ble_adv_fast_enabled  = true;                           //设置快速广播模式
+    init.config.ble_adv_fast_interval = APP_ADV_INTERVAL;   //广播间隔
+    init.config.ble_adv_fast_timeout  = APP_ADV_DURATION;   //广播持续时间  设置为0的时候表明不超时
+    //广播时间回调函数
     init.evt_handler = on_adv_evt;
-
+    //初始化广播
     err_code = ble_advertising_init(&m_advertising, &init);
     APP_ERROR_CHECK(err_code);
 
@@ -734,17 +824,16 @@ int main(void)
     buttons_leds_init(&erase_bonds);
     Board_LED0Init();
     SPI_Init();
-		ADC_Init();
     /***********************************************************************************/
 
     power_management_init();
     ble_stack_init();
-    gap_params_init();
+    gap_params_init();      //GAP服务设置函数
     gatt_init();
-    advertising_init();
-    services_init();
+    advertising_init();     //ADV设置函数
+    services_init();            //设备信息服务初始化
     conn_params_init();
-    peer_manager_init();
+    peer_manager_init();    //首次连接参数协商与连接参数协商设置
 
     /**********************************************************************************/
 
@@ -753,8 +842,7 @@ int main(void)
     application_timers_start();
 
     advertising_start(erase_bonds);
-		
-		ADC_Disable();	
+
 
     // Enter main loop.
     for (;;)

@@ -94,9 +94,9 @@ extern "C" {
 
 /** @defgroup BLE_UUID_TYPES Types of UUID
  * @{ */
-#define BLE_UUID_TYPE_UNKNOWN       0x00 /**< Invalid UUID type. */
-#define BLE_UUID_TYPE_BLE           0x01 /**< Bluetooth SIG UUID (16-bit). */
-#define BLE_UUID_TYPE_VENDOR_BEGIN  0x02 /**< Vendor UUID types start at this index (128-bit). */
+#define BLE_UUID_TYPE_UNKNOWN       0x00 /**< 无效的UUID  					Invalid UUID type. */
+#define BLE_UUID_TYPE_BLE           0x01 /**< 标准的UUID  					Bluetooth SIG UUID (16-bit). */
+#define BLE_UUID_TYPE_VENDOR_BEGIN  0x02 /**< 厂商自定义的UUID			Vendor UUID types start at this index (128-bit). */
 /** @} */
 
 

@@ -318,7 +318,7 @@
  
 
 #ifndef BLE_DIS_ENABLED
-#define BLE_DIS_ENABLED 0
+#define BLE_DIS_ENABLED 1
 #endif
 
 // <q> BLE_GLS_ENABLED  - ble_gls - Glucose Service
@@ -346,7 +346,7 @@
  
 
 #ifndef BLE_HRS_ENABLED
-#define BLE_HRS_ENABLED 0
+#define BLE_HRS_ENABLED 1
 #endif
 
 // <q> BLE_HTS_ENABLED  - ble_hts - Health Thermometer Service

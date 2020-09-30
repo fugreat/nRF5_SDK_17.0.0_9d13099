@@ -239,15 +239,15 @@ typedef struct
 /** @brief Analog-to-digital converter channel configuration structure. */
 typedef struct
 {
-    nrf_saadc_resistor_t  resistor_p; ///< Resistor value on positive input.
-    nrf_saadc_resistor_t  resistor_n; ///< Resistor value on negative input.
-    nrf_saadc_gain_t      gain;       ///< Gain control value.
-    nrf_saadc_reference_t reference;  ///< Reference control value.
-    nrf_saadc_acqtime_t   acq_time;   ///< Acquisition time.
-    nrf_saadc_mode_t      mode;       ///< SAADC mode. Single-ended or differential.
-    nrf_saadc_burst_t     burst;      ///< Burst mode configuration.
-    nrf_saadc_input_t     pin_p;      ///< Input positive pin selection.
-    nrf_saadc_input_t     pin_n;      ///< Input negative pin selection.
+    nrf_saadc_resistor_t  resistor_p; ///< Resistor value on positive input.	//正极电阻
+    nrf_saadc_resistor_t  resistor_n; ///< Resistor value on negative input.	//负极电阻
+    nrf_saadc_gain_t      gain;       ///< Gain control value.								//增益
+    nrf_saadc_reference_t reference;  ///< Reference control value.						//0.6V参考带你呀
+    nrf_saadc_acqtime_t   acq_time;   ///< Acquisition time.									//采样时间
+    nrf_saadc_mode_t      mode;       ///< SAADC mode. Single-ended or differential.//设置ADC的工作模式
+    nrf_saadc_burst_t     burst;      ///< Burst mode configuration.					//BURST模式
+    nrf_saadc_input_t     pin_p;      ///< Input positive pin selection.			//正端连接的模拟引脚
+    nrf_saadc_input_t     pin_n;      ///< Input negative pin selection.			//负端连接的模拟引脚
 } nrf_saadc_channel_config_t;
 
 

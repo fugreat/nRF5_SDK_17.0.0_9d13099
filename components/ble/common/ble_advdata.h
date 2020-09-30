@@ -116,8 +116,8 @@ typedef enum
 /**@brief UUID list type. */
 typedef struct
 {
-    uint16_t                     uuid_cnt;                            /**< Number of UUID entries. */
-    ble_uuid_t *                 p_uuids;                             /**< Pointer to UUID array entries. */
+    uint16_t                     uuid_cnt;                            /**< UUID的数量									Number of UUID entries. */
+    ble_uuid_t *                 p_uuids;                             /**< 指向服务UUID数组的入口			Pointer to UUID array entries. */
 } ble_advdata_uuid_list_t;
 
 /**@brief Connection interval range structure. */
@@ -150,8 +150,8 @@ typedef struct
     bool                         include_appearance;                  /**< Determines if Appearance shall be included. */
     uint8_t                      flags;                               /**< Advertising data Flags field. */
     int8_t *                     p_tx_power_level;                    /**< TX Power Level field. */
-    ble_advdata_uuid_list_t      uuids_more_available;                /**< List of UUIDs in the 'More Available' list. */
-    ble_advdata_uuid_list_t      uuids_complete;                      /**< List of UUIDs in the 'Complete' list. */
+    ble_advdata_uuid_list_t      uuids_more_available;                /**< 广播中包含部分UUID列表时使用					List of UUIDs in the 'More Available' list. */
+    ble_advdata_uuid_list_t      uuids_complete;                      /**< 广播中包含完成的UUID列表的时候使用		List of UUIDs in the 'Complete' list. */
     ble_advdata_uuid_list_t      uuids_solicited;                     /**< List of solicited UUIDs. */
     ble_advdata_conn_int_t *     p_slave_conn_int;                    /**< Slave Connection Interval Range. */
     ble_advdata_manuf_data_t *   p_manuf_specific_data;               /**< Manufacturer specific data. */

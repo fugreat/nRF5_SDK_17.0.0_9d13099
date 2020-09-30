@@ -90,6 +90,15 @@ extern "C" {
     .pin_p      = (nrf_saadc_input_t)(PIN_P),       \
     .pin_n      = NRF_SAADC_INPUT_DISABLED          \
 }
+//.resistor_p = NRF_SAADC_RESISTOR_DISABLED, 				旁路通道正极电阻梯
+//.resistor_n = NRF_SAADC_RESISTOR_DISABLED,				旁路通道负极电阻梯
+//NRF_SAADC_GAIN1_6  																增益1/6
+//NRF_SAADC_REFERENCE_INTERNAL   										内部参考电压0.6V
+//.acq_time   = NRF_SAADC_ACQTIME_10US,							采样时间
+//NRF_SAADC_MODE_SINGLE_ENDED       								单端模式
+//.burst      = NRF_SAADC_BURST_DISABLED,  					禁止burst模式
+//.pin_p      = (nrf_saadc_input_t)(PIN_P),    			通道正极连接模拟输入引脚   
+//.pin_n      = NRF_SAADC_INPUT_DISABLED  					通道负极连接模拟输入引脚
 
 /**
  * @brief Macro for setting @ref nrf_saadc_channel_config_t to default settings
@@ -114,18 +123,18 @@ extern "C" {
 /** @brief SAADC driver configuration structure. */
 typedef struct
 {
-    nrf_saadc_resolution_t resolution;         ///< Resolution configuration.
-    nrf_saadc_oversample_t oversample;         ///< Oversampling configuration.
-    uint8_t                interrupt_priority; ///< Interrupt priority.
-    bool                   low_power_mode;     ///< Indicates if low power mode is active.
+    nrf_saadc_resolution_t resolution;         ///< Resolution configuration.//分辨率
+    nrf_saadc_oversample_t oversample;         ///< Oversampling configuration.//过采样
+    uint8_t                interrupt_priority; ///< Interrupt priority.//中断优先级
+    bool                   low_power_mode;     ///< Indicates if low power mode is active.//SAADC的低功耗模式
 } nrfx_saadc_config_t;
 
 /** @brief SAADC driver event types. */
 typedef enum
 {
-    NRFX_SAADC_EVT_DONE,         ///< Event generated when the buffer is filled with samples.
-    NRFX_SAADC_EVT_LIMIT,        ///< Event generated after one of the limits is reached.
-    NRFX_SAADC_EVT_CALIBRATEDONE ///< Event generated when the calibration is complete.
+    NRFX_SAADC_EVT_DONE,         ///< Event generated when the buffer is filled with samples.//采样值填满缓冲是产生该事件
+    NRFX_SAADC_EVT_LIMIT,        ///< Event generated after one of the limits is reached.//采样值达到门限值时产生该事件
+    NRFX_SAADC_EVT_CALIBRATEDONE ///< Event generated when the calibration is complete.//校准完成后产生该事件
 } nrfx_saadc_evt_type_t;
 
 /** @brief SAADC driver done event data. */

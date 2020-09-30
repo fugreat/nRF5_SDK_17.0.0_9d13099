@@ -331,22 +331,22 @@ typedef struct
  */
 typedef struct
 {
-    uint16_t                    uuid;                     /**< Characteristic UUID (16 bits UUIDs).*/
-    uint8_t                     uuid_type;                /**< Base UUID. If 0, the Bluetooth SIG UUID will be used. Otherwise, this should be a value returned by @ref sd_ble_uuid_vs_add when adding the base UUID.*/
-    uint16_t                    max_len;                  /**< Maximum length of the characteristic value.*/
-    uint16_t                    init_len;                 /**< Initial length of the characteristic value.*/
-    uint8_t *                   p_init_value;             /**< Initial encoded value of the characteristic.*/
-    bool                        is_var_len;               /**< Indicates if the characteristic value has variable length.*/
-    ble_gatt_char_props_t       char_props;               /**< Characteristic properties.*/
-    ble_gatt_char_ext_props_t   char_ext_props;           /**< Characteristic extended properties.*/
-    bool                        is_defered_read;          /**< Indicate if deferred read operations are supported.*/
-    bool                        is_defered_write;         /**< Indicate if deferred write operations are supported.*/
-    security_req_t              read_access;              /**< Security requirement for reading the characteristic value.*/
-    security_req_t              write_access;             /**< Security requirement for writing the characteristic value.*/
-    security_req_t              cccd_write_access;        /**< Security requirement for writing the characteristic's CCCD.*/
-    bool                        is_value_user;            /**< Indicate if the content of the characteristic is to be stored in the application (user) or in the stack.*/
-    ble_add_char_user_desc_t    *p_user_descr;            /**< Pointer to user descriptor if needed*/
-    ble_gatts_char_pf_t         *p_presentation_format;   /**< Pointer to characteristic format if needed*/
+    uint16_t                    uuid;                     //特征UUID												/**< Characteristic UUID (16 bits UUIDs).*/
+    uint8_t                     uuid_type;                																	/**< Base UUID. If 0, the Bluetooth SIG UUID will be used. Otherwise, this should be a value returned by @ref sd_ble_uuid_vs_add when adding the base UUID.*/
+    uint16_t                    max_len;                  //特征值的最大长度								/**< Maximum length of the characteristic value.*/
+    uint16_t                    init_len;                 //特征值的初始长度								/**< Initial length of the characteristic value.*/
+    uint8_t *                   p_init_value;             //特征的初始编码值								/**< Initial encoded value of the characteristic.*/
+    bool                        is_var_len;               //指示特征长度是不是可变长度			/**< Indicates if the characteristic value has variable length.*/
+    ble_gatt_char_props_t       char_props;               //特征性质												/**< Characteristic properties.*/
+    ble_gatt_char_ext_props_t   char_ext_props;           //特征扩展性质										/**< Characteristic extended properties.*/
+    bool                        is_defered_read;          //指示是否支持延时读操作					/**< Indicate if deferred read operations are supported.*/
+    bool                        is_defered_write;         //指示是否支持延时写操作					/**< Indicate if deferred write operations are supported.*/
+    security_req_t              read_access;              //读特征值的安全需求							/**< Security requirement for reading the characteristic value.*/
+    security_req_t              write_access;             //写特征值的写安全需求						/**< Security requirement for writing the characteristic value.*/
+    security_req_t              cccd_write_access;        //写特征的CCCD的安全需求					/**< Security requirement for writing the characteristic's CCCD.*/
+    bool                        is_value_user;            																	/**< Indicate if the content of the characteristic is to be stored in the application (user) or in the stack.*/
+    ble_add_char_user_desc_t    *p_user_descr;            //如果需要指向用户描述符					/**< Pointer to user descriptor if needed*/
+    ble_gatts_char_pf_t         *p_presentation_format;   //如果需要，指向特征表示格式			/**< Pointer to characteristic format if needed*/
 } ble_add_char_params_t;
 
 

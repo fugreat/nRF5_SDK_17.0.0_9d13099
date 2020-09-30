@@ -75,7 +75,7 @@ static nrf_ppi_channel_t     m_ppi_channel;
 static uint32_t              m_adc_evt_counter;
 
 
-void timer_handler(nrf_timer_event_t event_type, void * p_context)
+void timer_handler(nrf_timer_event_t event_type, void *p_context)
 {
 
 }
@@ -103,7 +103,7 @@ void saadc_sampling_event_init(void)
     nrf_drv_timer_enable(&m_timer);
 
     uint32_t timer_compare_event_addr = nrf_drv_timer_compare_event_address_get(&m_timer,
-                                                                                NRF_TIMER_CC_CHANNEL0);
+                                        NRF_TIMER_CC_CHANNEL0);
     uint32_t saadc_sample_task_addr   = nrf_drv_saadc_sample_task_get();
 
     /* setup ppi channel so that timer compare event is triggering sample task in SAADC */
@@ -125,7 +125,7 @@ void saadc_sampling_event_enable(void)
 }
 
 
-void saadc_callback(nrf_drv_saadc_evt_t const * p_event)
+void saadc_callback(nrf_drv_saadc_evt_t const *p_event)
 {
     if (p_event->type == NRF_DRV_SAADC_EVT_DONE)
     {
@@ -150,18 +150,18 @@ void saadc_init(void)
 {
     ret_code_t err_code;
     nrf_saadc_channel_config_t channel_config =
-        NRF_DRV_SAADC_DEFAULT_CHANNEL_CONFIG_SE(NRF_SAADC_INPUT_AIN0);
+        NRF_DRV_SAADC_DEFAULT_CHANNEL_CONFIG_SE(NRF_SAADC_INPUT_AIN0);//单端输入模式的配置
 
-    err_code = nrf_drv_saadc_init(NULL, saadc_callback);
+    err_code = nrf_drv_saadc_init(NULL, saadc_callback);//NULL用来设置SAADC使用默认的配置。
     APP_ERROR_CHECK(err_code);
 
-    err_code = nrf_drv_saadc_channel_init(0, &channel_config);
+    err_code = nrf_drv_saadc_channel_init(0, &channel_config);//配置单端输入模式
     APP_ERROR_CHECK(err_code);
 
-    err_code = nrf_drv_saadc_buffer_convert(m_buffer_pool[0], SAMPLES_IN_BUFFER);
+    err_code = nrf_drv_saadc_buffer_convert(m_buffer_pool[0], SAMPLES_IN_BUFFER);//函数配置缓冲区
     APP_ERROR_CHECK(err_code);
 
-    err_code = nrf_drv_saadc_buffer_convert(m_buffer_pool[1], SAMPLES_IN_BUFFER);
+    err_code = nrf_drv_saadc_buffer_convert(m_buffer_pool[1], SAMPLES_IN_BUFFER);//函数配置缓冲区
     APP_ERROR_CHECK(err_code);
 
 }
