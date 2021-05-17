@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2016 - 2020, Nordic Semiconductor ASA
+ * Copyright (c) 2016 - 2019, Nordic Semiconductor ASA
  *
  * All rights reserved.
  *
@@ -93,6 +93,8 @@ extern "C" {
  */
 #if defined  (NRF51)
     #define BOOTLOADER_SETTINGS_ADDRESS     (0x0003FC00UL)
+#elif defined( NRF52805_XXAA )
+    #define BOOTLOADER_SETTINGS_ADDRESS     (0x0002F000UL)
 #elif defined( NRF52810_XXAA )
     #define BOOTLOADER_SETTINGS_ADDRESS     (0x0002F000UL)
 #elif defined( NRF52811_XXAA )
@@ -120,12 +122,14 @@ extern "C" {
     #define NRF_MBR_PARAMS_PAGE_ADDRESS         (0x0007E000UL)
 #elif defined(NRF52833_XXAA)
     #define NRF_MBR_PARAMS_PAGE_ADDRESS         (0x0007E000UL)
+#elif defined(NRF52820_XXAA)
+    #define NRF_MBR_PARAMS_PAGE_ADDRESS         (0x0003E000UL)
 #elif defined(NRF52810_XXAA)
     #define NRF_MBR_PARAMS_PAGE_ADDRESS         (0x0002E000UL)
 #elif defined(NRF52811_XXAA)
     #define NRF_MBR_PARAMS_PAGE_ADDRESS         (0x0002E000UL)
-#elif defined(NRF52820_XXAA)
-    #define NRF_MBR_PARAMS_PAGE_ADDRESS         (0x0003E000UL)
+  #elif defined(NRF52805_XXAA)
+    #define NRF_MBR_PARAMS_PAGE_ADDRESS         (0x0002E000UL)
 #endif
 
 #define BOOTLOADER_SETTINGS_BACKUP_ADDRESS NRF_MBR_PARAMS_PAGE_ADDRESS

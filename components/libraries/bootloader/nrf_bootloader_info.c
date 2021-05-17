@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2016 - 2020, Nordic Semiconductor ASA
+ * Copyright (c) 2016 - 2019, Nordic Semiconductor ASA
  *
  * All rights reserved.
  *
@@ -81,7 +81,7 @@ void nrf_bootloader_debug_port_disable(void)
         nrf_nvmc_write_word((uint32_t)&NRF_UICR->APPROTECT, 0x0);
         NVIC_SystemReset();
     }
-#if (!defined (NRF52810_XXAA) && !defined (NRF52811_XXAA) && !defined (NRF52832_XXAA) && !defined (NRF52832_XXAB))
+#if (!defined (NRF52805_XXAA) && !defined (NRF52810_XXAA) && !defined (NRF52811_XXAA) && !defined (NRF52832_XXAA) && !defined (NRF52832_XXAB))
     if (NRF_UICR->DEBUGCTRL != 0x0)
     {
         nrf_nvmc_write_word((uint32_t)&NRF_UICR->DEBUGCTRL, 0x0);
